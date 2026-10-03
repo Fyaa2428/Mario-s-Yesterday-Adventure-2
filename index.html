@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Yesterday Quest — Year 3 Speaking Adventure</title>
+<style>
+:root{
+  --sky:#69d5ff;--grass:#4fc24f;--dark:#17233d;--red:#ed3b43;
+  --yellow:#ffd447;--blue:#3d7cff;--cream:#fff7df;--purple:#8d5cff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Trebuchet MS",Arial,sans-serif;background:#101a35;color:var(--dark)}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
+.app{max-width:1200px;margin:auto;padding:14px}
+.topbar{
+  position:sticky;top:10px;z-index:50;background:#fff;border:4px solid #17233d;
+  border-radius:18px;padding:10px 14px;display:flex;justify-content:space-between;
+  align-items:center;gap:10px;box-shadow:0 7px 0 #091126
+}
+.logo{font-weight:1000;font-size:20px}.logo span{color:var(--red)}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.pill{background:#fff3b0;border:3px solid #17233d;border-radius:14px;padding:6px 10px;font-weight:900}
+.screen{margin-top:14px}.panel{background:#fff;border:5px solid #17233d;border-radius:24px;box-shadow:0 9px 0 #091126;overflow:hidden}
+.hero{min-height:690px;position:relative;text-align:center;padding:42px 24px;background:linear-gradient(#63d8ff 0 63%,#59c953 63% 100%);overflow:hidden}
+.cloud{position:absolute;font-size:70px;animation:cloud 20s linear infinite;opacity:.9}.c1{top:70px;left:-130px}.c2{top:160px;left:-400px;animation-delay:-9s}
+@keyframes cloud{to{transform:translateX(1450px)}}
+.hero h1{font-size:clamp(38px,7vw,76px);margin:25px 0 5px;text-shadow:5px 5px 0 #fff;position:relative}
+.hero h1 span{color:#e93543}.hero p{font-size:20px;font-weight:800;position:relative}
+.pixel-title{display:inline-block;background:#fff;border:5px solid #17233d;border-radius:16px;padding:8px 20px;box-shadow:0 7px 0 #091126}
+.mario{
+  font-size:100px;display:inline-block;animation:jump 1.3s infinite steps(2,end);
+  filter:drop-shadow(5px 7px 0 #17233d)
+}
+@keyframes jump{50%{transform:translateY(-25px) rotate(-3deg)}}
+.brickrow{position:absolute;bottom:115px;left:0;right:0;font-size:34px;letter-spacing:4px;white-space:nowrap}
+.hill{position:absolute;bottom:50px;left:8%;font-size:140px}.hill2{left:auto;right:5%;font-size:110px}
+.primary,.danger,.secondary{
+ border:4px solid #17233d;border-radius:14px;padding:13px 20px;font-weight:1000;
+ box-shadow:0 6px 0 #091126;transition:.12s;position:relative
+}
+.primary{background:#ffdf35}.secondary{background:#dfe8ff}.danger{background:#ff6672;color:#fff}
+.primary:active,.secondary:active,.danger:active{transform:translateY(4px);box-shadow:0 2px 0 #091126}
+.instructions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:850px;margin:25px auto;position:relative}
+.info{background:#ffffffdf;border:3px solid #17233d;border-radius:15px;padding:14px;font-weight:800}
+.info b{font-size:25px;display:block;color:#7b4de8}
+.world{padding:24px;background:linear-gradient(#6ad8ff 0 32%,#75d8f3 32% 33%,#7bd55c 33% 100%)}
+.world-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.world h2{font-size:32px;margin:5px 0}.progress{height:18px;background:#d9dce8;border:3px solid #17233d;border-radius:20px;overflow:hidden;margin:15px 0}
+.progress>div{height:100%;width:0;background:#ffd447;transition:.5s}
+.map{position:relative;min-height:530px;background:linear-gradient(#78dfff 0 62%,#4ebf4d 62%);border:4px solid #17233d;border-radius:20px;overflow:hidden}
+.map:after{content:"☁️     ☁️        ☁️";position:absolute;top:25px;left:20px;font-size:55px;white-space:pre;word-spacing:50px;opacity:.7}
+.path{position:absolute;height:22px;background:#c18a51;border:4px solid #17233d;border-radius:20px;left:10%;right:10%;top:55%;transform:rotate(-4deg)}
+.mapnode{position:absolute;width:120px;height:120px;border-radius:50%;border:5px solid #17233d;background:#fff;box-shadow:0 8px 0 #091126;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:1000;transition:.2s}
+.mapnode:hover{transform:translateY(-8px) scale(1.04)}.mapnode .emoji{font-size:42px}.mapnode small{font-size:12px}.locked{filter:grayscale(1);opacity:.6;cursor:not-allowed}.done{background:#c9ffd9}.n0{left:7%;top:40%}.n1{left:24%;top:22%}.n2{left:42%;top:48%}.n3{left:59%;top:27%}.n4{left:75%;top:49%}.n5{left:84%;top:17%}
+.map-character{position:absolute;left:2%;bottom:18px;font-size:55px;z-index:5;animation:walk 1s infinite steps(2)}
+@keyframes walk{50%{transform:translateY(-5px)}}
+.level{background:#222d50;min-height:690px;padding:12px}
+.levelbar{background:#fff;border:4px solid #17233d;border-radius:15px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.stage{
+ height:545px;position:relative;overflow:hidden;border:5px solid #17233d;border-radius:18px;
+ background:linear-gradient(#5bd7ff 0 64%,#63c94f 64%);margin-top:10px
+}
+.stage:before{content:"";position:absolute;inset:0;background:
+ radial-gradient(circle at 15% 25%,#fff 0 34px,transparent 35px),
+ radial-gradient(circle at 70% 16%,#fff 0 26px,transparent 27px);
+ opacity:.75}
+.sun{position:absolute;right:8%;top:35px;font-size:70px;animation:spin 12s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mountain{position:absolute;bottom:92px;font-size:145px;filter:drop-shadow(3px 3px 0 #26723a)}.m1{left:2%}.m2{left:28%;font-size:115px}.m3{right:2%;font-size:130px}
+.ground{position:absolute;bottom:0;height:100px;left:0;right:0;background:repeating-linear-gradient(90deg,#4dbb43 0 48px,#43ad3d 48px 96px);border-top:6px solid #17233d}
+.block{position:absolute;width:58px;height:58px;border:4px solid #17233d;background:#e99b3c;box-shadow:inset 0 0 0 5px #f5c05a;display:flex;align-items:center;justify-content:center;font-size:25px;z-index:4}
+.b1{left:18%;bottom:175px}.b2{left:24%;bottom:235px}.b3{left:30%;bottom:175px}.b4{left:61%;bottom:205px}.b5{left:68%;bottom:265px}
+.pipe{position:absolute;bottom:100px;width:70px;height:110px;background:#2bc45a;border:5px solid #17233d;border-radius:10px 10px 0 0;z-index:3}.pipe:before{content:"";position:absolute;top:-20px;left:-9px;width:80px;height:25px;background:#42df70;border:5px solid #17233d;border-radius:8px}.p1{left:39%}.p2{right:13%}
+.coin{position:absolute;font-size:38px;z-index:8;animation:coin 1s ease-in-out infinite;filter:drop-shadow(2px 3px 0 #17233d)}
+@keyframes coin{50%{transform:translateY(-12px) scale(1.08)}}
+.player{position:absolute;left:5%;bottom:96px;font-size:58px;z-index:10;transition:left .12s linear;filter:drop-shadow(3px 4px 0 #17233d)}
+.enemy{position:absolute;bottom:93px;font-size:48px;z-index:7;animation:enemy 2s ease-in-out infinite alternate}
+@keyframes enemy{to{transform:translateX(35px)}}
+.controls{display:flex;justify-content:center;gap:8px;margin-top:10px}.control{width:62px;height:48px;border:4px solid #17233d;border-radius:12px;background:#fff;font-size:23px;font-weight:1000;box-shadow:0 4px 0 #091126}
+.mission{
+ position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(700px,92%);
+ background:#fff;border:5px solid #17233d;border-radius:22px;padding:25px;z-index:30;
+ box-shadow:0 12px 0 #091126;max-height:90%;overflow:auto
+}
+.mission h2{margin-top:0;font-size:29px}.speechline{font-size:24px;background:#f2f4ff;border:3px solid #bfc8ea;border-radius:15px;padding:14px;text-align:center;font-weight:1000}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.choice{padding:13px;border:4px solid #17233d;border-radius:13px;background:#dfe8ff;font-size:21px;font-weight:1000}.choice.correct{background:#a9f3c5}.choice.wrong{background:#ff9eaa}
+.feedback{text-align:center;min-height:35px;font-weight:1000;font-size:18px}
+.speak{background:#f7f0ff;border:3px solid #c7b2ff;border-radius:15px;padding:15px;text-align:center}.mic{width:78px;height:78px;border-radius:50%;border:5px solid #17233d;background:#ff5969;font-size:32px;box-shadow:0 6px 0 #091126}.mic.listening{animation:pulse .7s infinite}
+@keyframes pulse{50%{transform:scale(1.08);box-shadow:0 0 0 13px #ff596955}}
+.transcript{background:#fff;border:3px dashed #8994b8;border-radius:12px;padding:10px;margin-top:10px;min-height:48px}
+.final{padding:40px;text-align:center;background:linear-gradient(135deg,#fff7d9,#e9e4ff)}
+.bigscore{font-size:68px;color:#7b4de8;font-weight:1000;text-shadow:3px 3px #fff}
+.trophies{font-size:55px}.resultgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:800px;margin:25px auto}.resultbox{background:#fff;border:4px solid #17233d;border-radius:16px;padding:16px;font-weight:800}.resultbox b{display:block;font-size:30px;color:#e23f4c}
+.tip{max-width:750px;margin:15px auto;background:#fff;border:4px solid #17233d;border-radius:15px;padding:15px;text-align:left}
+.footer-note{text-align:center;color:#dbe5ff;font-size:12px;padding:10px}
+@media(max-width:750px){
+ .instructions,.resultgrid{grid-template-columns:1fr}
+ .mapnode{width:92px;height:92px}.mapnode .emoji{font-size:31px}.mapnode small{font-size:10px}
+ .stage{height:500px}.player{font-size:48px}.enemy{font-size:40px}
+ .mission{padding:17px}.choices{grid-template-columns:1fr}
+}
+
+/* Two physical checkpoints before the finish flag */
+.progress-hud{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:20;
+ background:#fff;border:3px solid #17233d;border-radius:12px;padding:7px 12px;
+ font-weight:1000;box-shadow:3px 3px 0 #091126;white-space:nowrap}
+.stage-checkpoint{position:absolute;bottom:96px;width:48px;height:105px;z-index:8;
+ display:flex;align-items:flex-start;justify-content:center}
+.stage-checkpoint .pole{position:absolute;bottom:0;width:7px;height:83px;background:#fff;border:3px solid #17233d;border-radius:4px}
+.stage-checkpoint .banner{position:absolute;top:0;left:5px;width:42px;height:31px;
+ display:flex;align-items:center;justify-content:center;background:#ffd447;
+ border:3px solid #17233d;border-radius:4px 9px 9px 4px;font-size:11px;font-weight:1000;
+ box-shadow:3px 3px 0 #091126}
+.stage-checkpoint.reached .banner{background:#62ed83}
+.stage-checkpoint.active .banner{animation:checkpointPulse .7s infinite alternate}
+@keyframes checkpointPulse{to{transform:scale(1.12);background:#fff17a}}
+#checkpoint1{left:30%}#checkpoint2{left:60%}
+#checkpoint{right:3%;opacity:.45;filter:grayscale(1);transition:.2s}
+#checkpoint.unlocked{opacity:1;filter:none;animation:flagWave .6s infinite alternate}
+@keyframes flagWave{to{transform:translateY(-7px) rotate(5deg)}}
+@media(max-width:750px){.progress-hud{font-size:11px;top:8px}.stage-checkpoint{transform:scale(.85);transform-origin:bottom center}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="logo">🍄 <span>YESTERDAY</span> QUEST</div>
+  <div class="stats">
+    <div class="pill">🪙 <span id="coins">0</span></div>
+    <div class="pill">⭐ <span id="score">0</span></div>
+    <div class="pill">🏁 <span id="levels">0</span>/6</div>
+  </div>
+</header>
+
+<main class="screen">
+
+<section id="home" class="panel hero">
+  <div class="cloud c1">☁️</div><div class="cloud c2">☁️</div>
+  <div class="mario">🧑🏻‍🔧</div>
+  <div class="pixel-title">A YEAR 3 SPEAKING ADVENTURE</div>
+  <h1><span>YESTERDAY</span> QUEST</h1>
+  <p>Jump, explore, collect coins and tell the story of what happened yesterday!</p>
+  <div class="instructions">
+    <div class="info"><b>🕹️ MOVE</b>Use ◀ ▶ to move and ⬆️ to jump over the level.</div>
+    <div class="info"><b>🪙 COLLECT</b>Grab coins and discover hidden checkpoints.</div>
+    <div class="info"><b>🎤 SPEAK</b>Use <b>was / were + adjective</b> to complete each mission.</div>
+  </div>
+  <button class="primary" onclick="startGame()">🍄 START QUEST</button>
+  <div class="brickrow">🟫🟧🟫🟧🟫🟧🟫🟧🟫🟧🟫🟧</div>
+  <div class="hill">⛰️</div><div class="hill hill2">⛰️</div>
+</section>
+
+<section id="world" class="panel world hidden">
+  <div class="world-head">
+    <div><h2>🗺️ Mushroom World: Yesterday</h2><b>Move from one place to another. Complete every world.</b></div>
+    <button class="secondary" onclick="showScreen('home')">← Home</button>
+  </div>
+  <div class="progress"><div id="worldProgress"></div></div>
+  <div class="map">
+    <div class="path"></div>
+    <div class="map-character">🧑🏻‍🔧</div>
+    <button class="mapnode n0" onclick="openLevel(0)"><span class="emoji">🌳</span><small>1. Park</small></button>
+    <button class="mapnode n1 locked" id="node1" onclick="openLevel(1)"><span class="emoji">🏖️</span><small>2. Beach</small></button>
+    <button class="mapnode n2 locked" id="node2" onclick="openLevel(2)"><span class="emoji">🦖</span><small>3. Dino Jungle</small></button>
+    <button class="mapnode n3 locked" id="node3" onclick="openLevel(3)"><span class="emoji">🏛️</span><small>4. Museum</small></button>
+    <button class="mapnode n4 locked" id="node4" onclick="openLevel(4)"><span class="emoji">🎠</span><small>5. Playground</small></button>
+    <button class="mapnode n5 locked" id="node5" onclick="openLevel(5)"><span class="emoji">🏰</span><small>6. Castle</small></button>
+  </div>
+</section>
+
+<section id="level" class="panel level hidden">
+  <div class="levelbar">
+    <b id="levelTitle">World 1</b>
+    <span id="levelHint">← → Move • collect coins • find the checkpoint!</span>
+    <button class="secondary" onclick="returnWorld()">🗺️ World Map</button>
+  </div>
+  <div class="stage" id="stage">
+    <div class="progress-hud" id="progressHud">🚩 CHECKPOINTS 0/2 • FLAG LOCKED 🔒</div>
+    <div class="stage-checkpoint" id="checkpoint1"><div class="banner">CP 1</div><div class="pole"></div></div>
+    <div class="stage-checkpoint" id="checkpoint2"><div class="banner">CP 2</div><div class="pole"></div></div>
+    <div class="sun">☀️</div>
+    <div class="mountain m1">⛰️</div><div class="mountain m2">⛰️</div><div class="mountain m3">⛰️</div>
+    <div class="block b1">?</div><div class="block b2">?</div><div class="block b3">?</div><div class="block b4">?</div><div class="block b5">?</div>
+    <div class="pipe p1"></div><div class="pipe p2"></div>
+    <div class="coin" style="left:14%;bottom:210px">🪙</div>
+    <div class="coin" style="left:33%;bottom:290px">🪙</div>
+    <div class="coin" style="left:53%;bottom:240px">🪙</div>
+    <div class="coin" style="left:78%;bottom:300px">🪙</div>
+    <div class="enemy" style="left:48%">🐢</div>
+    <div class="enemy" style="left:82%;animation-delay:-1s">👾</div>
+    <div class="ground"></div>
+    <div class="player" id="player">🧑🏻‍🔧</div>
+    <div id="checkpoint" style="position:absolute;right:4%;bottom:96px;font-size:70px;z-index:8">🚩</div>
+  </div>
+  <div class="controls">
+    <button class="control" onclick="movePlayer(-1)">◀</button>
+    <button class="control" onclick="jumpPlayer()">⬆️</button>
+    <button class="control" onclick="movePlayer(1)">▶</button>
+  </div>
+  <div class="footer-note">Tip: You do not need perfect pronunciation. Try the sentence, listen to the feedback, and try again.</div>
+</section>
+
+<section id="final" class="panel final hidden">
+  <div class="trophies">🏆🍄⭐</div>
+  <h2>YOU SAVED YESTERDAY!</h2>
+  <div class="bigscore" id="finalScore">0</div>
+  <div id="finalStars" class="trophies"></div>
+  <div class="resultgrid">
+    <div class="resultbox"><b id="finalCoins">0</b>Coins</div>
+    <div class="resultbox"><b id="finalGrammar">0</b>Grammar</div>
+    <div class="resultbox"><b id="finalSpeaking">0</b>Speaking</div>
+    <div class="resultbox"><b id="finalLevels">0</b>Worlds</div>
+  </div>
+  <div class="tip">
+    <b>🎤 Bonus classroom challenge</b>
+    <p>Tell your partner two things about yesterday.</p>
+    <p><b>“I was happy yesterday.”</b><br><b>“We were excited yesterday.”</b></p>
+  </div>
+  <button class="primary" onclick="restartGame()">🔄 Play Again</button>
+</section>
+
+</main>
+</div>
+
+<script>
+const levels=[
+ {name:"Green Park",emoji:"🌳",intro:"You explored the park yesterday.",
+  qs:[
+   {q:"I ___ happy at the park yesterday.",a:"was",adj:"happy",s:"I was happy at the park yesterday."},
+   {q:"We ___ excited at the park yesterday.",a:"were",adj:"excited",s:"We were excited at the park yesterday."}
+ ]},
+ {name:"Sunny Beach",emoji:"🏖️",intro:"You visited the beach yesterday.",
+  qs:[
+   {q:"She ___ excited at the beach yesterday.",a:"was",adj:"excited",s:"She was excited at the beach yesterday."},
+   {q:"They ___ tired after swimming yesterday.",a:"were",adj:"tired",s:"They were tired after swimming yesterday."}
+ ]},
+ {name:"Dino Jungle",emoji:"🦖",intro:"You discovered dinosaurs yesterday.",
+  qs:[
+   {q:"I ___ surprised at the jungle yesterday.",a:"was",adj:"surprised",s:"I was surprised at the jungle yesterday."},
+   {q:"We ___ happy to see the dinosaurs yesterday.",a:"were",adj:"happy",s:"We were happy to see the dinosaurs yesterday."}
+ ]},
+ {name:"Mystery Museum",emoji:"🏛️",intro:"You visited a mysterious museum yesterday.",
+  qs:[
+   {q:"He ___ interested in the dinosaurs yesterday.",a:"was",adj:"interested",s:"He was interested in the dinosaurs yesterday."},
+   {q:"We ___ amazed by the dinosaur yesterday.",a:"were",adj:"amazed",s:"We were amazed by the dinosaur yesterday."}
+ ]},
+ {name:"Rainbow Playground",emoji:"🎠",intro:"You played with your friends yesterday.",
+  qs:[
+   {q:"She ___ tired after playing yesterday.",a:"was",adj:"tired",s:"She was tired after playing yesterday."},
+   {q:"They ___ happy on the playground yesterday.",a:"were",adj:"happy",s:"They were happy on the playground yesterday."}
+ ]},
+ {name:"Princess Castle",emoji:"🏰",intro:"You reached the castle after your adventure.",
+  qs:[
+   {q:"I ___ excited at the castle yesterday.",a:"was",adj:"excited",s:"I was excited at the castle yesterday."},
+   {q:"We ___ happy at the castle yesterday.",a:"were",adj:"happy",s:"We were happy at the castle yesterday."}
+ ]}
+];
+
+let score=0,coins=0,grammar=0,speaking=0,completed=new Set(),current=0,qIndex=0;
+let x=5,jumping=false,listening=false,recognition=null,speechPassed=false;
+
+function showScreen(id){
+ document.querySelectorAll("main>section").forEach(s=>s.classList.add("hidden"));
+ document.getElementById(id).classList.remove("hidden");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function updateStats(){
+ document.getElementById("coins").textContent=coins;
+ document.getElementById("score").textContent=score;
+ document.getElementById("levels").textContent=completed.size;
+ document.getElementById("worldProgress").style.width=(completed.size/6*100)+"%";
+}
+function startGame(){
+ score=0;coins=0;grammar=0;speaking=0;completed=new Set();
+ updateStats();buildMap();showScreen("world");
+}
+function buildMap(){
+ for(let i=0;i<6;i++){
+  const n=document.getElementById("node"+i);
+  if(!n)continue;
+  if(i===0||completed.has(i-1)){n.classList.remove("locked")}
+  else n.classList.add("locked");
+  if(completed.has(i))n.classList.add("done");
+ }
+ updateStats();
+}
+let checkpointDone = [false, false];
+let checkpointModalOpen = false;
+let finishTriggered = false;
+
+function openLevel(i){
+ if(i>0&&!completed.has(i-1))return;
+ current=i;qIndex=0;x=5;speechPassed=false;
+ checkpointDone=[false,false];checkpointModalOpen=false;finishTriggered=false;
+ setupLevel();showScreen("level");
+}
+function setupLevel(){
+ const l=levels[current];
+ document.getElementById("levelTitle").textContent=`${l.emoji} World ${current+1}: ${l.name}`;
+ document.getElementById("levelHint").textContent=`${l.intro} Move through CP 1 and CP 2, then reach the flag!`;
+ document.getElementById("player").style.left=x+"%";
+ document.getElementById("player").style.transform="scaleX(1)";
+ document.querySelectorAll(".coin").forEach(c=>{c.style.opacity="1";c.dataset.taken="0"});
+ const flag=document.getElementById("checkpoint");flag.classList.remove("unlocked");
+ updateCheckpointProgress();
+}
+function updateCheckpointProgress(){
+ const done=checkpointDone.filter(Boolean).length;
+ const hud=document.getElementById("progressHud");
+ if(hud)hud.textContent=done<2?`🚩 CHECKPOINTS ${done}/2 • FLAG LOCKED 🔒`:`✅ CHECKPOINTS 2/2 • FLAG UNLOCKED 🏁`;
+ [0,1].forEach(i=>{
+  const el=document.getElementById("checkpoint"+(i+1));
+  if(el){el.classList.toggle("reached",checkpointDone[i]);el.classList.toggle("active",!checkpointDone[i] && (i===0 || checkpointDone[i-1]));}
+ });
+ document.getElementById("checkpoint").classList.toggle("unlocked",done===2);
+}
+function movePlayer(dir){
+ if(checkpointModalOpen || finishTriggered)return;
+ const oldX=x;
+ x=Math.max(3,Math.min(96,x+dir*4));
+ document.getElementById("player").style.left=x+"%";
+ if(dir>0)document.getElementById("player").style.transform="scaleX(1)";
+ if(dir<0)document.getElementById("player").style.transform="scaleX(-1)";
+ collectCoins();
+ // Crossing each marker opens its own mission. The player must complete CP1 before CP2.
+ if(dir>0 && !checkpointDone[0] && oldX<30 && x>=30){x=30;document.getElementById("player").style.left=x+"%";openCheckpoint(0);return;}
+ if(dir>0 && checkpointDone[0] && !checkpointDone[1] && oldX<60 && x>=60){x=60;document.getElementById("player").style.left=x+"%";openCheckpoint(1);return;}
+ if(dir>0 && checkpointDone[0] && checkpointDone[1] && oldX<88 && x>=88){x=90;document.getElementById("player").style.left=x+"%";reachFinalFlag();return;}
+ // Keep the flag locked until both checkpoint missions are completed.
+ if(!checkpointDone[0] || !checkpointDone[1])x=Math.min(x,checkpointDone[0]?58:28);
+ document.getElementById("player").style.left=x+"%";
+}
+function collectCoins(){
+ document.querySelectorAll(".coin").forEach(c=>{
+  if(c.dataset.taken==="1")return;
+  const cx=parseFloat(c.style.left);
+  if(Math.abs(x-cx)<4){
+   c.dataset.taken="1";c.style.opacity="0";coins++;score+=5;updateStats();beep(720);
+  }
+ });
+}
+function jumpPlayer(){
+ if(jumping)return;
+ jumping=true;
+ const p=document.getElementById("player");
+ p.style.transform="translateY(-90px)";
+ setTimeout(()=>{p.style.transform="translateY(0)";jumping=false},500);
+}
+document.addEventListener("keydown",e=>{
+ if(document.getElementById("level").classList.contains("hidden"))return;
+ if(e.key==="ArrowRight")movePlayer(1);
+ if(e.key==="ArrowLeft")movePlayer(-1);
+ if(e.key==="ArrowUp"||e.key===" ")jumpPlayer();
+});
+function openCheckpoint(index){
+ if(checkpointModalOpen || checkpointDone[index])return;
+ if(index===1 && !checkpointDone[0])return;
+ qIndex=index;
+ checkpointModalOpen=true;
+ renderMission(true);
+}
+function renderMission(force){
+ const old=document.querySelector(".mission");if(old)old.remove();
+ const q=levels[current].qs[qIndex];
+ const box=document.createElement("div");box.className="mission";
+ box.innerHTML=`
+  <h2>${levels[current].emoji} Checkpoint ${qIndex+1} of 2</h2>
+  <p><b>Grammar Power-Up:</b> Choose the correct word to repair the sentence.</p>
+  <div class="speechline">${q.q.replace("___","<span style='color:#8d5cff'>?</span>")}</div>
+  <div class="choices"><button class="choice" onclick="checkGrammar(this,'was')">WAS</button><button class="choice" onclick="checkGrammar(this,'were')">WERE</button></div>
+  <div id="feedback" class="feedback"></div>
+  <div id="speakArea" class="speak hidden">
+    <h3>🎤 Speaking Power-Up</h3>
+    <p>Say the whole sentence:</p><div><b>${q.s}</b></div><br>
+    <button class="mic" id="mic" onclick="startSpeaking()">🎙️</button>
+    <div class="transcript" id="transcript">Press the microphone and speak.</div>
+    <div id="speechFeedback" class="feedback"></div>
+    <button class="secondary" onclick="showModel()">👂 Show Model</button>
+  </div>
+  <br><button id="continueBtn" class="primary hidden" onclick="nextMission()">Continue →</button>
+  <button class="secondary" onclick="document.querySelector('.mission').remove()">Close</button>
+ `;
+ document.getElementById("stage").appendChild(box);
+}
+function checkGrammar(btn,chosen){
+ const q=levels[current].qs[qIndex];
+ const buttons=btn.parentElement.querySelectorAll(".choice");
+ if(chosen===q.a){
+  btn.classList.add("correct");buttons.forEach(b=>b.disabled=true);
+  grammar+=10;score+=10;beep(900);
+  document.getElementById("feedback").innerHTML="🌟 Correct! Grammar power-up collected! +10";
+  document.getElementById("speakArea").classList.remove("hidden");
+ }else{
+  btn.classList.add("wrong");btn.disabled=true;
+  document.getElementById("feedback").innerHTML=`❌ Try again. Remember: <b>${q.a.toUpperCase()}</b>.`;
+  beep(220);
+ }
+ updateStats();
+}
+function startSpeaking(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){
+  document.getElementById("transcript").textContent="Speech recognition is unavailable here. Say the sentence aloud to your teacher/partner, then use Show Model.";
+  return;
+ }
+ if(listening){recognition.stop();return}
+ recognition=new SR();recognition.lang="en-US";recognition.interimResults=false;recognition.maxAlternatives=1;listening=true;
+ const mic=document.getElementById("mic");mic.classList.add("listening");mic.textContent="🔴";
+ document.getElementById("transcript").textContent="Listening... speak now!";
+ recognition.onresult=e=>{
+  const text=e.results[0][0].transcript;
+  document.getElementById("transcript").innerHTML=`<b>You said:</b> “${text}”`;
+  checkSpeech(text);
+ };
+ recognition.onerror=()=>{document.getElementById("transcript").textContent="I couldn't hear you clearly. Try again."};
+ recognition.onend=()=>{listening=false;mic.classList.remove("listening");mic.textContent="🎙️"};
+ recognition.start();
+}
+function checkSpeech(text){
+ const q=levels[current].qs[qIndex];
+ const spoken=text.toLowerCase().replace(/[.,!?]/g," ");
+ const correct=new RegExp("\\b"+q.a+"\\b").test(spoken);
+ const wrong=new RegExp("\\b"+(q.a==="was"?"were":"was")+"\\b").test(spoken);
+ const adj=spoken.includes(q.adj);
+ const out=document.getElementById("speechFeedback");
+ if(wrong){out.innerHTML=`❌ You used the other verb. Try <b>${q.a.toUpperCase()}</b>.`;return}
+ if(!correct){out.innerHTML=`❌ Remember to say <b>${q.a}</b>.`;return}
+ if(!adj){out.innerHTML=`❌ Good verb! Now include the adjective <b>${q.adj}</b>.`;return}
+ if(speechPassed)return;
+ speechPassed=true;speaking+=5;score+=5;updateStats();beep(1100);
+ out.innerHTML="🎉 Excellent! Your sentence has the correct verb and adjective. +5";
+ document.getElementById("continueBtn").classList.remove("hidden");
+}
+function showModel(){
+ const q=levels[current].qs[qIndex];
+ document.getElementById("transcript").innerHTML=`<b>Model:</b> “${q.s}”`;
+}
+function nextMission(){
+ if(!speechPassed)return;
+ const old=document.querySelector(".mission");if(old)old.remove();
+ checkpointDone[qIndex]=true;
+ checkpointModalOpen=false;
+ score+=10; // checkpoint completion bonus
+ updateStats();updateCheckpointProgress();beep(1250);
+ if(qIndex===0){
+  document.getElementById("levelHint").textContent="Checkpoint 1 cleared! Keep moving right to reach Checkpoint 2.";
+ }else{
+  document.getElementById("levelHint").textContent="Both checkpoints cleared! Run and jump to the final flag!";
+ }
+}
+function reachFinalFlag(){
+ if(finishTriggered || !checkpointDone[0] || !checkpointDone[1])return;
+ finishTriggered=true;
+ completed.add(current);score+=15;updateStats();beep(1450);
+ showCompletion();
+}
+function showCompletion(){
+ const old=document.querySelector(".mission");if(old)old.remove();
+ const isLast=current===5;
+ const nextButton=isLast
+  ? `<button class="primary" onclick="finishGame()">🏆 See Final Score</button>`
+  : `<button class="primary" onclick="openLevel(${current+1})">🌍 Travel to ${levels[current+1].name} →</button>
+     <button class="secondary" onclick="returnWorld()">🗺️ World Map</button>`;
+ const box=document.createElement("div");box.className="mission";
+ box.innerHTML=`<div style="font-size:65px;text-align:center">🏁🍄⭐</div>
+ <h2 style="text-align:center">World Complete!</h2>
+ <p style="text-align:center;font-size:20px"><b>${levels[current].name}</b> cleared! You passed both checkpoints and reached the final flag. +15</p>
+ <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${nextButton}</div>`;
+ document.getElementById("stage").appendChild(box);
+}
+function returnWorld(){
+ const old=document.querySelector(".mission");if(old)old.remove();
+ checkpointModalOpen=false;
+ if(completed.size===6){finishGame();return}
+ buildMap();showScreen("world");
+}
+function finishGame(){
+ document.getElementById("finalScore").textContent=score+" POINTS";
+ document.getElementById("finalCoins").textContent=coins;
+ document.getElementById("finalGrammar").textContent=grammar;
+ document.getElementById("finalSpeaking").textContent=speaking;
+ document.getElementById("finalLevels").textContent=completed.size;
+ const stars=score>=170?3:score>=125?2:1;
+ document.getElementById("finalStars").textContent="⭐".repeat(stars)+"☆".repeat(3-stars);
+ showScreen("final");
+}
+function restartGame(){startGame()}
+function beep(freq){
+ try{
+  const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+  const ctx=new C(),o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.value=freq;o.type="square";g.gain.value=.035;o.connect(g);g.connect(ctx.destination);
+  o.start();o.stop(ctx.currentTime+.08);
+ }catch(e){}
+}
+updateStats();
+</script>
+</body>
+</html>
